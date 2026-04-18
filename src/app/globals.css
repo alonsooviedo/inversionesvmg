@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #080D1A;
+  --bg-secondary: #0E1628;
+  --bg-card: #111C33;
+  --bg-hover: #162040;
+  --bg-border: #1A2744;
+  --accent-cyan: #00D9FF;
+  --accent-green: #00E5A0;
+  --accent-amber: #F59E0B;
+  --accent-red: #EF4444;
+  --text-primary: #E8EDF5;
+  --text-secondary: #7A8FB0;
+  --text-muted: #3D5080;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "DM Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--bg-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Mono numbers */
+.font-mono { font-family: "JetBrains Mono", monospace; }
+
+/* Card glow on hover */
+.card-hover {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-hover:hover {
+  border-color: #00D9FF33;
+  box-shadow: 0 0 24px #00D9FF0D;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #00D9FF, #00E5A0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom select - remove native OS styling */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A8FB0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px !important;
+  cursor: pointer;
+}
+
+select option {
+  background-color: #0E1628;
+  color: #E8EDF5;
+}
+
+/* Sidebar nav hover */
+.nav-item:not(.nav-item-active):hover {
+  background: #162040 !important;
+  color: #B0C4DE !important;
+  border-color: #1A274466 !important;
+}
+
+/* Subtle grid bg */
+.grid-bg {
+  background-image: 
+    linear-gradient(rgba(26,39,68,0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,39,68,0.5) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
