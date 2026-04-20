@@ -26,7 +26,7 @@ export default async function MovimientosPage() {
       .limit(200),
     supabase
       .from("investments")
-      .select("id, name, currency, institution:institutions(name)")
+      .select("id, name, currency, current_balance, institution:institutions(name)")
       .eq("status", "active")
       .order("name"),
     supabase.from("exchange_rates").select("*").order("period", { ascending: false }).limit(1),
@@ -35,11 +35,12 @@ export default async function MovimientosPage() {
   const transactions = (txRes.data ?? []) as TxWithInvestment[];
   const exchangeRate = ((ratesRes.data ?? []) as ExchangeRate[])[0]?.usd_to_crc ?? 520;
 
-  const activeInvestments = (activeInvRes.data ?? []).map((i: { id: string; name: string; currency: string; institution: { name: string }[] | { name: string } | null }) => ({
+  const activeInvestments = (activeInvRes.data ?? []).map((i: { id: string; name: string; currency: string; current_balance: number; institution: { name: string }[] | { name: string } | null }) => ({
     id: i.id as string,
     name: i.name as string,
     institution_name: Array.isArray(i.institution) ? (i.institution[0]?.name ?? "—") : (i.institution?.name ?? "—"),
     currency: i.currency as string,
+    currentBalance: i.current_balance as number,
   }));
 
   const currentP = currentPeriod();

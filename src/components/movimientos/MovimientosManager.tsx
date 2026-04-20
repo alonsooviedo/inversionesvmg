@@ -37,6 +37,7 @@ interface ActiveInvestment {
   name: string;
   institution_name: string;
   currency: string;
+  currentBalance: number;
 }
 
 interface Props {
@@ -50,7 +51,29 @@ function TransactionForm({ activeInvestments, onClose }: { activeInvestments: Ac
   const router = useRouter();
   const [state, formAction] = useActionState(createTransaction, null);
   const [formKey, setFormKey] = useState(0);
+  const [selectedInvId, setSelectedInvId] = useState("");
+  const [type, setType] = useState("");
+  const [amount, setAmount] = useState("");
+  const [manualBalance, setManualBalance] = useState("");
   const today = new Date().toISOString().split("T")[0];
+
+  const selectedInv = activeInvestments.find((i) => i.id === selectedInvId);
+  const ADD_TYPES = ["interest", "deposit", "purchase"];
+  const SUB_TYPES = ["sale", "liquidation"];
+
+  // Calculate expected balance based on type and amount
+  let expectedBalance: string | null = null;
+  if (selectedInv && type && amount) {
+    const currentBal = selectedInv.currentBalance;
+    const amt = parseFloat(amount);
+    if (!isNaN(amt)) {
+      if (ADD_TYPES.includes(type)) {
+        expectedBalance = (currentBal + amt).toFixed(2);
+      } else if (SUB_TYPES.includes(type)) {
+        expectedBalance = (currentBal - amt).toFixed(2);
+      }
+    }
+  }
 
   useEffect(() => {
     if (state && "success" in state) { setFormKey((k) => k + 1); onClose(); router.refresh(); }
@@ -63,23 +86,34 @@ function TransactionForm({ activeInvestments, onClose }: { activeInvestments: Ac
       )}
       <div>
         <label className={LABEL}>Inversión</label>
-        <Dropdown name="investment_id" required style={INPUT}>
+        <Dropdown
+          name="investment_id"
+          required
+          style={INPUT}
+          onChange={(value) => setSelectedInvId(value)}>
           <option value="">Seleccionar…</option>
           {activeInvestments.map((inv) => (
             <option key={inv.id} value={inv.id}>{inv.name} — {inv.institution_name} ({inv.currency})</option>
           ))}
         </Dropdown>
+        {selectedInv && (
+          <p className="text-xs text-text-secondary mt-1">Saldo actual: <span style={{ color: "#00D9FF" }}>{selectedInv.currentBalance.toFixed(2)}</span> {selectedInv.currency}</p>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Tipo de movimiento</label>
-          <Dropdown name="type" required style={INPUT}>
+          <Dropdown
+            name="type"
+            required
+            style={INPUT}
+            onChange={(value) => setType(value)}>
             <option value="">Seleccionar…</option>
-            <option value="interest">Interés</option>
-            <option value="deposit">Depósito</option>
-            <option value="purchase">Compra</option>
-            <option value="liquidation">Liquidación</option>
-            <option value="sale">Venta</option>
+            <option value="interest">Interés (+suma)</option>
+            <option value="deposit">Depósito (+suma)</option>
+            <option value="purchase">Compra (+suma)</option>
+            <option value="liquidation">Liquidación (-resta)</option>
+            <option value="sale">Venta (-resta)</option>
           </Dropdown>
         </div>
         <div>
@@ -90,11 +124,34 @@ function TransactionForm({ activeInvestments, onClose }: { activeInvestments: Ac
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Monto</label>
-          <input name="amount" type="number" step="0.01" min="0" required style={INPUT} placeholder="0.00" />
+          <input
+            name="amount"
+            type="number"
+            step="0.01"
+            min="0"
+            required
+            style={INPUT}
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => setAmount(e.currentTarget.value)} />
         </div>
         <div>
           <label className={LABEL}>Saldo tras movimiento</label>
-          <input name="balance_after" type="number" step="0.01" min="0" style={INPUT} placeholder="0.00 (opcional)" />
+          <input
+            name="balance_after"
+            type="number"
+            step="0.01"
+            min="0"
+            style={INPUT}
+            placeholder={expectedBalance ? `${expectedBalance} (automático)` : "Dejar vacío para calcular"}
+            value={manualBalance}
+            onChange={(e) => setManualBalance(e.currentTarget.value)} />
+          {expectedBalance && !manualBalance && (
+            <p className="text-xs text-text-secondary mt-1">Se usará automáticamente: <span style={{ color: "#00E5A0" }}>{expectedBalance}</span></p>
+          )}
+          {manualBalance && expectedBalance && manualBalance !== expectedBalance && (
+            <p className="text-xs text-accent-amber mt-1">⚠️ Valor manual: {manualBalance} (diferente al calculado: {expectedBalance})</p>
+          )}
         </div>
       </div>
       <div>
