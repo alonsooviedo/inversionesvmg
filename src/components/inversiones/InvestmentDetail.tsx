@@ -9,7 +9,8 @@ import Dropdown from "@/components/forms/Dropdown";
 import Modal from "@/components/forms/Modal";
 import { formatUSD, formatCurrency, formatPercent, formatDate, transactionLabel, instrumentLabel } from "@/lib/utils";
 import type { Investment, Institution, Account, Transaction } from "@/lib/types";
-import { ArrowLeft, Pencil, Trash2, X, TrendingUp, Wallet, Percent, CalendarCheck } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, X, TrendingUp, Wallet, Percent, CalendarCheck, Plus } from "lucide-react";
+import { createTransaction } from "@/app/actions/transactions";
 
 const INPUT = {
   width: "100%", background: "#0E1628", border: "1px solid #1A2744",
@@ -44,6 +45,7 @@ interface Props {
 export default function InvestmentDetail({ investment, institutions, accounts, transactions, exchangeRate }: Props) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
+  const [createTxOpen, setCreateTxOpen] = useState(false);
   const [state, formAction] = useActionState(updateInvestment, null);
   const [formKey, setFormKey] = useState(0);
   const [editTx, setEditTx] = useState<Transaction | null>(null);
@@ -260,7 +262,17 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
 
       {/* Transaction history */}
       <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-text-secondary mb-3">Historial de movimientos</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-medium uppercase tracking-wider text-text-secondary">Historial de movimientos</p>
+          <button
+            onClick={() => setCreateTxOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            style={{ background: "linear-gradient(135deg, #00D9FF22, #00E5A022)", border: "1px solid #00D9FF44", color: "#00D9FF" }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#00D9FF66"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#00D9FF44"; }}>
+            <Plus size={13} /> Agregar movimiento
+          </button>
+        </div>
         {transactions.length === 0 ? (
           <div className="rounded-2xl p-6 text-center text-text-muted text-sm" style={{ background: "#111C33", border: "1px solid #1A2744" }}>
             Sin movimientos registrados
@@ -327,6 +339,11 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
       <Modal isOpen={!!editTx} onClose={() => setEditTx(null)} title="Editar movimiento" maxWidth="max-w-lg">
         {editTx && <EditTransactionForm tx={editTx} currency={investment.currency} onClose={() => setEditTx(null)} />}
       </Modal>
+
+      {/* Create transaction modal */}
+      <Modal isOpen={createTxOpen} onClose={() => setCreateTxOpen(false)} title="Agregar movimiento" maxWidth="max-w-lg">
+        <CreateTransactionForm investment={investment} onClose={() => setCreateTxOpen(false)} />
+      </Modal>
     </div>
   );
 }
@@ -382,6 +399,112 @@ function EditTransactionForm({ tx, currency, onClose }: {
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" onClick={onClose} className="px-5 py-2 rounded-xl text-sm text-text-muted" style={{ background: "#0E1628", border: "1px solid #1A2744" }}>Cancelar</button>
         <SubmitButton label="Guardar cambios" />
+      </div>
+    </form>
+  );
+}
+
+// ── Create transaction form (inline for InvestmentDetail) ──────────────────────
+
+function CreateTransactionForm({ investment, onClose }: {
+  investment: Investment; onClose: () => void;
+}) {
+  const router = useRouter();
+  const [state, formAction] = useActionState(createTransaction, null);
+  const [formKey, setFormKey] = useState(0);
+  const [type, setType] = useState("");
+  const [amount, setAmount] = useState("");
+  const [manualBalance, setManualBalance] = useState("");
+  const today = new Date().toISOString().split("T")[0];
+
+  const ADD_TYPES = ["interest", "deposit", "purchase"];
+  const SUB_TYPES = ["sale", "liquidation"];
+
+  // Calculate expected balance
+  let expectedBalance: string | null = null;
+  if (type && amount) {
+    const amt = parseFloat(amount);
+    if (!isNaN(amt)) {
+      if (ADD_TYPES.includes(type)) {
+        expectedBalance = (investment.current_balance + amt).toFixed(2);
+      } else if (SUB_TYPES.includes(type)) {
+        expectedBalance = (investment.current_balance - amt).toFixed(2);
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (state && "success" in state) { setFormKey((k) => k + 1); onClose(); router.refresh(); }
+  }, [state, onClose, router]);
+
+  return (
+    <form key={formKey} action={formAction} className="space-y-4">
+      <input type="hidden" name="investment_id" value={investment.id} />
+      {state && "error" in state && (
+        <div className="text-xs px-3 py-2 rounded-lg" style={{ background: "#EF444415", color: "#EF4444", border: "1px solid #EF444430" }}>{state.error}</div>
+      )}
+      <div>
+        <p className="text-xs text-text-secondary mb-2">Inversión: <span style={{ color: "#00D9FF" }}>{investment.name}</span></p>
+        <p className="text-xs text-text-secondary">Saldo actual: <span style={{ color: "#00E5A0" }}>{investment.current_balance.toFixed(2)} {investment.currency}</span></p>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Tipo</label>
+          <Dropdown
+            name="type"
+            required
+            style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }}
+            onChange={(value) => setType(value)}>
+            <option value="">Seleccionar…</option>
+            <option value="interest">Interés (+suma)</option>
+            <option value="deposit">Depósito (+suma)</option>
+            <option value="purchase">Compra (+suma)</option>
+            <option value="liquidation">Liquidación (-resta)</option>
+            <option value="sale">Venta (-resta)</option>
+          </Dropdown>
+        </div>
+        <div>
+          <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Fecha</label>
+          <input name="transaction_date" type="date" required defaultValue={today} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Monto ({investment.currency})</label>
+          <input
+            name="amount"
+            type="number"
+            step="0.01"
+            min="0"
+            required
+            style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }}
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => setAmount(e.currentTarget.value)} />
+        </div>
+        <div>
+          <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Saldo tras mov.</label>
+          <input
+            name="balance_after"
+            type="number"
+            step="0.01"
+            min="0"
+            style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }}
+            placeholder={expectedBalance ? `${expectedBalance} (automático)` : "Dejar vacío"}
+            value={manualBalance}
+            onChange={(e) => setManualBalance(e.currentTarget.value)} />
+          {expectedBalance && !manualBalance && (
+            <p className="text-xs text-text-secondary mt-1">Se usará: <span style={{ color: "#00E5A0" }}>{expectedBalance}</span></p>
+          )}
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Descripción</label>
+        <input name="description" style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} placeholder="(opcional)" />
+      </div>
+      <div className="flex justify-end gap-3 pt-2">
+        <button type="button" onClick={onClose} className="px-5 py-2 rounded-xl text-sm text-text-muted" style={{ background: "#0E1628", border: "1px solid #1A2744" }}>Cancelar</button>
+        <SubmitButton label="Registrar movimiento" />
       </div>
     </form>
   );

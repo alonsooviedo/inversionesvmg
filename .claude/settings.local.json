@@ -15,7 +15,10 @@
       "Bash(git add *)",
       "Bash(git commit -m 'Initial commit: Portfolio investment management app *)",
       "Bash(git push *)",
-      "Bash(git commit -m 'Improve transaction form with balance preview and auto-calculation *)"
+      "Bash(git commit -m 'Improve transaction form with balance preview and auto-calculation *)",
+      "mcp__368a36b9-21a9-4f56-a71e-d358e68d0f7f__list_deployments",
+      "mcp__368a36b9-21a9-4f56-a71e-d358e68d0f7f__deploy_to_vercel",
+      "Bash(git commit -m 'Add '\\\\''Agregar movimiento'\\\\'' button to investment detail page *)"
     ]
   }
 }
