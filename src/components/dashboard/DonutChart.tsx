@@ -55,6 +55,8 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: { name
 }
 
 export default function DonutChart({ data, totalUSD }: Props) {
+  const [isHovering, setIsHovering] = React.useState(false);
+
   if (!data.length) {
     return (
       <div className="flex items-center justify-center h-full text-text-muted text-sm">
@@ -66,7 +68,10 @@ export default function DonutChart({ data, totalUSD }: Props) {
   return (
     <div className="flex items-center gap-6 h-full">
       {/* Donut */}
-      <div className="flex-shrink-0 w-[180px] h-[180px] relative">
+      <div
+        className="flex-shrink-0 w-[180px] h-[180px] relative"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -89,13 +94,15 @@ export default function DonutChart({ data, totalUSD }: Props) {
             <Tooltip content={<CustomTooltip />} />
           </PieChart>
         </ResponsiveContainer>
-        {/* Center label */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-[9px] text-text-muted uppercase tracking-wider">Total</span>
-          <span className="text-[11px] font-mono font-semibold text-text-primary mt-0.5 leading-tight">
-            {formatUSD(totalUSD)}
-          </span>
-        </div>
+        {/* Center label - hidden on hover */}
+        {!isHovering && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span className="text-[9px] text-text-muted uppercase tracking-wider">Total</span>
+            <span className="text-[11px] font-mono font-semibold text-text-primary mt-0.5 leading-tight">
+              {formatUSD(totalUSD)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Legend */}
