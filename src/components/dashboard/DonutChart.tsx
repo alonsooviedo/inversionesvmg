@@ -36,11 +36,12 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: { name
   const d = payload[0];
   return (
     <div
-      className="rounded-lg px-4 py-2 text-xs"
+      className="rounded-lg px-3 py-2 text-xs"
       style={{
         background: "#162040",
         border: "1px solid #1A2744",
-        minWidth: "280px",
+        minWidth: "160px",
+        maxWidth: "200px",
         zIndex: 50,
         boxShadow: "0 4px 16px rgba(0, 0, 0, 0.8)",
       }}>
