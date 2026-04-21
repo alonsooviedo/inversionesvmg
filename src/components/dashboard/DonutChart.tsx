@@ -35,11 +35,13 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: { name
   const d = payload[0];
   return (
     <div
-      className="rounded-xl px-3 py-2.5 text-xs"
-      style={{ background: "#162040", border: "1px solid #1A2744" }}>
-      <p className="text-text-secondary mb-1">{d.name}</p>
-      <p className="font-mono font-medium text-text-primary">{formatUSD(d.value)}</p>
-      <p className="text-text-muted mt-0.5">{(d.payload.percentage * 100).toFixed(1)}%</p>
+      className="rounded-lg px-3 py-2 text-xs space-y-1.5"
+      style={{ background: "#162040", border: "1px solid #1A2744", minWidth: "160px" }}>
+      <p className="text-text-secondary font-medium">{d.name}</p>
+      <p className="font-mono text-sm font-semibold text-text-primary break-words">
+        {formatUSD(d.value)}
+      </p>
+      <p className="text-text-muted">{(d.payload.percentage * 100).toFixed(1)}%</p>
     </div>
   );
 }
