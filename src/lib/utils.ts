@@ -27,7 +27,9 @@ export function formatPercent(value: number): string {
 }
 
 export function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("es-CR", {
+  // Parse date string (YYYY-MM-DD) without timezone conversion
+  const [year, month, day] = dateStr.split("-");
+  return new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString("es-CR", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -35,7 +37,9 @@ export function formatDate(dateStr: string): string {
 }
 
 export function formatMonth(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("es-CR", {
+  // Parse date string (YYYY-MM-DD) without timezone conversion
+  const [year, month] = dateStr.split("-");
+  return new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("es-CR", {
     year: "numeric",
     month: "long",
   });
