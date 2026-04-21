@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   PieChart,
   Pie,
@@ -55,7 +56,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: { name
 }
 
 export default function DonutChart({ data, totalUSD }: Props) {
-  const [isHovering, setIsHovering] = React.useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   if (!data.length) {
     return (
