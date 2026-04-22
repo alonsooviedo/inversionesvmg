@@ -26,12 +26,12 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = "ma
       style={{ background: "rgba(8, 13, 26, 0.85)", backdropFilter: "blur(4px)" }}
       onClick={onClose}>
       <div
-        className={`w-full ${maxWidth} max-h-[90vh] overflow-y-auto rounded-2xl`}
+        className={`w-full ${maxWidth} max-h-[90vh] rounded-2xl flex flex-col`}
         style={{ background: "#111C33", border: "1px solid #1A2744" }}
         onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 py-4 sticky top-0 z-10"
+          className="flex items-center justify-between px-6 py-4 sticky top-0 z-10 flex-shrink-0"
           style={{ background: "#111C33", borderBottom: "1px solid #1A2744" }}>
           <h2 className="text-sm font-semibold text-text-primary">{title}</h2>
           <button
@@ -43,7 +43,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = "ma
             ✕
           </button>
         </div>
-        <div className="px-6 py-5">{children}</div>
+        <div className="px-6 py-5 overflow-y-auto flex-1">{children}</div>
       </div>
     </div>
   );
