@@ -11,7 +11,7 @@ import type { Transaction } from "@/lib/types";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
 const INPUT = {
-  width: "100%", background: "#0E1628", border: "1px solid #1A2744",
+  width: "100%", boxSizing: "border-box" as const, background: "#0E1628", border: "1px solid #1A2744",
   borderRadius: "8px", padding: "8px 12px", fontSize: "13px",
   color: "#E8EDF5", outline: "none",
 } as const;
@@ -239,10 +239,10 @@ export default function MovimientosManager({ transactions, activeInvestments }: 
 
   return (
     <>
-      <div className="flex justify-end mb-2">
+      <div className="flex justify-center md:justify-end mb-2">
         <button
           onClick={() => setCreateOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
+          className="w-full md:w-auto flex items-center justify-center md:justify-start gap-2 px-4 py-2 rounded-xl text-sm font-medium"
           style={{ background: "linear-gradient(135deg, #00D9FF22, #00E5A022)", border: "1px solid #00D9FF44", color: "#00D9FF" }}>
           <Plus size={14} /> Registrar movimiento
         </button>

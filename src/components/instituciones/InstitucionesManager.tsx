@@ -10,7 +10,7 @@ import type { Institution, Investment, ExchangeRate } from "@/lib/types";
 import { Plus, Building2 } from "lucide-react";
 
 const INPUT = {
-  width: "100%", background: "#0E1628", border: "1px solid #1A2744",
+  width: "100%", boxSizing: "border-box" as const, background: "#0E1628", border: "1px solid #1A2744",
   borderRadius: "8px", padding: "8px 12px", fontSize: "13px",
   color: "#E8EDF5", outline: "none",
 } as const;

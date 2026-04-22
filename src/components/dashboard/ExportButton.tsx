@@ -217,9 +217,9 @@ export default function ExportButton({
     <button
       onClick={handleExport}
       className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1 md:py-2 rounded-xl text-xs md:text-sm font-medium transition-all whitespace-nowrap"
-      style={{ background: "linear-gradient(135deg, #00D9FF18, #00E5A012)", border: "1px solid #00D9FF33", color: "#00D9FF" }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = "linear-gradient(135deg, #00D9FF28, #00E5A020)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = "linear-gradient(135deg, #00D9FF18, #00E5A012)"; }}>
+      style={{ background: "linear-gradient(135deg, #00D9FF22, #00E5A022)", border: "1px solid #00D9FF44", color: "#00D9FF" }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = "linear-gradient(135deg, #00D9FF2f, #00E5A02f)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = "linear-gradient(135deg, #00D9FF22, #00E5A022)"; }}>
       <FileDown size={12} className="md:block hidden" />
       <FileDown size={14} className="md:hidden" />
       <span className="hidden md:inline">Exportar PDF</span>
