@@ -13,10 +13,10 @@ export default async function DashboardLayout({
   if (!user) redirect("/login");
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen">
       <Sidebar />
-      <main className="flex-1 ml-56 min-h-screen">
-        <div className="p-8">
+      <main className="min-h-screen md:ml-56">
+        <div className="p-4 md:p-8">
           {children}
         </div>
       </main>

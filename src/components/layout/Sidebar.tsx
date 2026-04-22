@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
@@ -13,6 +14,8 @@ import {
   LogOut,
   ChevronRight,
   History,
+  Menu,
+  X,
 } from "lucide-react";
 
 const NAV = [
@@ -29,6 +32,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+  const [isOpen, setIsOpen] = useState(false);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -37,9 +41,33 @@ export default function Sidebar() {
   }
 
   return (
-    <aside
-      className="fixed left-0 top-0 h-screen w-56 flex flex-col z-50"
-      style={{ background: "#0E1628", borderRight: "1px solid #1A2744" }}>
+    <>
+      {/* Hamburger button - visible only on mobile */}
+      <div className="fixed top-0 left-0 md:hidden z-40 p-4">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 rounded-lg transition-colors"
+          style={{ background: "#0E1628", border: "1px solid #1A2744", color: "#7A8FB0" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#00D9FF")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#7A8FB0")}>
+          {isOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 md:hidden z-30 bg-black/50"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed left-0 top-0 h-screen w-56 flex flex-col z-40 md:z-50 transition-transform duration-300 ${
+          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        } md:translate-x-0 md:block`}
+        style={{ background: "#0E1628", borderRight: "1px solid #1A2744" }}>
       {/* Logo */}
       <div className="px-6 py-6 flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -63,6 +91,7 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
+              onClick={() => setIsOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group nav-item${isActive ? " nav-item-active" : ""}`}
               style={{
                 background: isActive ? "#162040" : "transparent",
@@ -89,6 +118,7 @@ export default function Sidebar() {
           <span>Salir</span>
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
