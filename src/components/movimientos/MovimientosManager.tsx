@@ -118,7 +118,7 @@ function TransactionForm({ activeInvestments, onClose }: { activeInvestments: Ac
         </div>
         <div>
           <label className={LABEL}>Fecha</label>
-          <input name="transaction_date" type="date" required defaultValue={today} style={INPUT} />
+          <input name="transaction_date" type="date" required defaultValue={today} style={{ ...INPUT, minHeight: "44px" }} />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

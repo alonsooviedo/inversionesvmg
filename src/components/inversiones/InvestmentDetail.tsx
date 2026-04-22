@@ -227,11 +227,11 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL}>Fecha de compra</label>
-                <input name="purchase_date" type="date" defaultValue={investment.purchase_date ?? ""} style={INPUT} />
+                <input name="purchase_date" type="date" defaultValue={investment.purchase_date ?? ""} style={{ ...INPUT, minHeight: "44px" }} />
               </div>
               <div>
                 <label className={LABEL}>Fecha de vencimiento</label>
-                <input name="maturity_date" type="date" defaultValue={investment.maturity_date ?? ""} style={INPUT} />
+                <input name="maturity_date" type="date" defaultValue={investment.maturity_date ?? ""} style={{ ...INPUT, minHeight: "44px" }} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -379,13 +379,13 @@ function EditTransactionForm({ tx, currency, onClose }: {
         </div>
         <div>
           <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Fecha</label>
-          <input name="transaction_date" type="date" required defaultValue={tx.transaction_date} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} />
+          <input name="transaction_date" type="date" required defaultValue={tx.transaction_date} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none", minHeight: "44px" }} />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Monto ({currency})</label>
-          <input name="amount" type="number" step="0.01" min="0" required defaultValue={tx.amount} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} />
+          <input name="amount" type="number" step="0.01" min="0" required defaultValue={tx.amount} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none", minHeight: "44px" }} />
         </div>
         <div>
           <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Saldo tras mov.</label>
@@ -394,7 +394,7 @@ function EditTransactionForm({ tx, currency, onClose }: {
       </div>
       <div>
         <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Descripción</label>
-        <input name="description" defaultValue={tx.description ?? ""} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} />
+        <input name="description" defaultValue={tx.description ?? ""} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none", minHeight: "44px" }} />
       </div>
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" onClick={onClose} className="px-5 py-2 rounded-xl text-sm text-text-muted" style={{ background: "#0E1628", border: "1px solid #1A2744" }}>Cancelar</button>
@@ -465,7 +465,7 @@ function CreateTransactionForm({ investment, onClose }: {
         </div>
         <div>
           <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Fecha</label>
-          <input name="transaction_date" type="date" required defaultValue={today} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} />
+          <input name="transaction_date" type="date" required defaultValue={today} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none", minHeight: "44px" }} />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -502,8 +502,8 @@ function CreateTransactionForm({ investment, onClose }: {
         <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Descripción</label>
         <input name="description" style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} placeholder="(opcional)" />
       </div>
-      <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={onClose} className="px-5 py-2 rounded-xl text-sm text-text-muted" style={{ background: "#0E1628", border: "1px solid #1A2744" }}>Cancelar</button>
+      <div className="flex flex-col-reverse md:flex-row md:justify-end gap-3 pt-2">
+        <button type="button" onClick={onClose} className="w-full md:w-auto px-5 py-2 rounded-xl text-sm text-text-muted" style={{ background: "#0E1628", border: "1px solid #1A2744" }}>Cancelar</button>
         <SubmitButton label="Registrar movimiento" />
       </div>
     </form>

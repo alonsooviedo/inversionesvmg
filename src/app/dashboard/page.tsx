@@ -194,18 +194,40 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-text-primary">Resumen</h1>
-          <p className="text-sm text-text-muted mt-0.5">
-            {investments.length} inversiones activas · tipo de cambio{" "}
-            <span className="font-mono text-text-secondary">
-              ₡{exchangeRate.toLocaleString("es-CR")} / USD
-            </span>
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs font-mono text-text-muted">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-0">
+        <div className="flex-1">
+          <div className="flex items-start justify-between gap-3 md:gap-4">
+            <div>
+              <h1 className="text-xl font-semibold text-text-primary">Resumen</h1>
+              <p className="text-sm text-text-muted mt-0.5">
+                {investments.length} inversiones activas · tipo de cambio{" "}
+                <span className="font-mono text-text-secondary">
+                  ₡{exchangeRate.toLocaleString("es-CR")} / USD
+                </span>
+              </p>
+            </div>
+            <ExportButton
+              investments={tableRows.map((r) => ({
+                name: r.name,
+                institution_name: r.institution_name,
+                account_name: r.account_name,
+                account_type: (investments.find((i) => i.id === r.id)?.account as { type?: string } | undefined)?.type,
+                instrument_type: r.instrument_type,
+                currency: r.currency,
+                current_balance: r.current_balance,
+                current_balance_usd: r.current_balance_usd,
+                interest_rate: r.interest_rate,
+                maturity_date: r.maturity_date,
+              }))}
+              totalUSD={totalUSD}
+              totalCRC={totalCRC}
+              totalInUSD={totalInUSD}
+              monthlyInterestUSD={monthlyInterest}
+              ytdInterestUSD={ytdInterest}
+              exchangeRate={exchangeRate}
+            />
+          </div>
+          <span className="text-xs font-mono text-text-muted mt-2 inline-block md:hidden">
             {new Date().toLocaleDateString("es-CR", {
               weekday: "short",
               day: "numeric",
@@ -213,27 +235,15 @@ export default async function DashboardPage() {
               year: "numeric",
             })}
           </span>
-          <ExportButton
-            investments={tableRows.map((r) => ({
-              name: r.name,
-              institution_name: r.institution_name,
-              account_name: r.account_name,
-              account_type: (investments.find((i) => i.id === r.id)?.account as { type?: string } | undefined)?.type,
-              instrument_type: r.instrument_type,
-              currency: r.currency,
-              current_balance: r.current_balance,
-              current_balance_usd: r.current_balance_usd,
-              interest_rate: r.interest_rate,
-              maturity_date: r.maturity_date,
-            }))}
-            totalUSD={totalUSD}
-            totalCRC={totalCRC}
-            totalInUSD={totalInUSD}
-            monthlyInterestUSD={monthlyInterest}
-            ytdInterestUSD={ytdInterest}
-            exchangeRate={exchangeRate}
-          />
         </div>
+        <span className="text-xs font-mono text-text-muted hidden md:inline">
+          {new Date().toLocaleDateString("es-CR", {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })}
+        </span>
       </div>
 
       {/* KPIs */}

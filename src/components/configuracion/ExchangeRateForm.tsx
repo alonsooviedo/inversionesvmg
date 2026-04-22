@@ -42,7 +42,7 @@ export default function ExchangeRateForm() {
       )}
       <div>
         <label className={LABEL}>Período</label>
-        <input name="period" type="date" required defaultValue={defaultPeriod} style={INPUT} />
+        <input name="period" type="date" required defaultValue={defaultPeriod} style={{ ...INPUT, minHeight: "44px" }} />
       </div>
       <div>
         <label className={LABEL}>Colones por 1 USD (₡)</label>

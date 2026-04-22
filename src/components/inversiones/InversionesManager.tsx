@@ -175,11 +175,11 @@ function InvestmentForm({ institutions, accounts, investment, onClose }: Investm
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Fecha de compra</label>
-          <input name="purchase_date" type="date" defaultValue={investment?.purchase_date ?? ""} style={INPUT} />
+          <input name="purchase_date" type="date" defaultValue={investment?.purchase_date ?? ""} style={{ ...INPUT, minHeight: "44px" }} />
         </div>
         <div>
           <label className={LABEL}>Fecha de vencimiento</label>
-          <input name="maturity_date" type="date" defaultValue={investment?.maturity_date ?? ""} style={INPUT} />
+          <input name="maturity_date" type="date" defaultValue={investment?.maturity_date ?? ""} style={{ ...INPUT, minHeight: "44px" }} />
         </div>
       </div>
 
