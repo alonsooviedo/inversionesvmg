@@ -100,7 +100,7 @@ function TransactionForm({ activeInvestments, onClose }: { activeInvestments: Ac
           <p className="text-xs text-text-secondary mt-1">Saldo actual: <span style={{ color: "#00D9FF" }}>{selectedInv.currentBalance.toFixed(2)}</span> {selectedInv.currency}</p>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Tipo de movimiento</label>
           <Dropdown
@@ -121,7 +121,7 @@ function TransactionForm({ activeInvestments, onClose }: { activeInvestments: Ac
           <input name="transaction_date" type="date" required defaultValue={today} style={INPUT} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Monto</label>
           <input
@@ -182,7 +182,7 @@ function EditTransactionForm({ tx, onClose }: { tx: TxWithInvestment; onClose: (
       {state && "error" in state && (
         <div className="text-xs px-3 py-2 rounded-lg" style={{ background: "#EF444415", color: "#EF4444", border: "1px solid #EF444430" }}>{state.error}</div>
       )}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Tipo de movimiento</label>
           <Dropdown name="type" required defaultValue={tx.type} style={INPUT}>
@@ -198,7 +198,7 @@ function EditTransactionForm({ tx, onClose }: { tx: TxWithInvestment; onClose: (
           <input name="transaction_date" type="date" required defaultValue={tx.transaction_date} style={INPUT} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Monto</label>
           <input name="amount" type="number" step="0.01" min="0" required defaultValue={tx.amount} style={INPUT} />

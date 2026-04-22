@@ -83,7 +83,7 @@ function InvestmentForm({ institutions, accounts, investment, onClose }: Investm
       )}
 
       {/* Row 1 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="col-span-2">
           <label className={LABEL}>Nombre</label>
           <input name="name" required defaultValue={investment?.name} style={INPUT} placeholder="Ej. CDP BAC 12 meses" />
@@ -91,7 +91,7 @@ function InvestmentForm({ institutions, accounts, investment, onClose }: Investm
       </div>
 
       {/* Row 2 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Institución</label>
           <Dropdown name="institution_id" required defaultValue={investment?.institution_id} style={SELECT}>
@@ -109,7 +109,7 @@ function InvestmentForm({ institutions, accounts, investment, onClose }: Investm
       </div>
 
       {/* Row 3 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Tipo de instrumento</label>
           <Dropdown name="instrument_type" required defaultValue={investment?.instrument_type} style={SELECT}>
@@ -132,7 +132,7 @@ function InvestmentForm({ institutions, accounts, investment, onClose }: Investm
       </div>
 
       {/* Row 4 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Monto inicial</label>
           <input name="initial_amount" type="number" step="0.01" min="0" required defaultValue={investment?.initial_amount} style={INPUT} placeholder="0.00" />
@@ -144,7 +144,7 @@ function InvestmentForm({ institutions, accounts, investment, onClose }: Investm
       </div>
 
       {/* Row 5 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Tasa de interés (%)</label>
           <input
@@ -172,7 +172,7 @@ function InvestmentForm({ institutions, accounts, investment, onClose }: Investm
       </div>
 
       {/* Row 6 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Fecha de compra</label>
           <input name="purchase_date" type="date" defaultValue={investment?.purchase_date ?? ""} style={INPUT} />
@@ -184,7 +184,7 @@ function InvestmentForm({ institutions, accounts, investment, onClose }: Investm
       </div>
 
       {/* Row 7 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={LABEL}>Estado</label>
           <Dropdown name="status" required defaultValue={investment?.status ?? "active"} style={SELECT}>
@@ -254,9 +254,9 @@ export default function InversionesManager({ investments, institutions, accounts
   return (
     <>
       {/* Top bar: search + create */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 mb-4">
         {/* Search */}
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1">
           <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#7A8FB0", pointerEvents: "none" }} />
           <input
             value={search}
@@ -278,10 +278,9 @@ export default function InversionesManager({ investments, institutions, accounts
             </button>
           )}
         </div>
-        <div className="flex-1" />
         <button
           onClick={() => setCreateOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+          className="w-full md:w-auto flex items-center justify-center md:justify-start gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
           style={{ background: "linear-gradient(135deg, #00D9FF22, #00E5A022)", border: "1px solid #00D9FF44", color: "#00D9FF" }}>
           <Plus size={14} /> Nueva inversión
         </button>

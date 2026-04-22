@@ -130,7 +130,7 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {[
           { label: "Saldo Actual", value: formatCurrency(investment.current_balance, investment.currency), sub: `${investment.currency}`, icon: <Wallet size={14} />, accent: "#00D9FF" },
           { label: "Equiv. USD", value: formatUSD(usd), sub: "Al tipo de cambio actual", icon: <TrendingUp size={14} />, accent: "#00E5A0" },
@@ -158,13 +158,13 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
             {state && "error" in state && (
               <div className="text-xs px-3 py-2 rounded-lg" style={{ background: "#EF444415", color: "#EF4444", border: "1px solid #EF444430" }}>{state.error}</div>
             )}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className={LABEL}>Nombre</label>
                 <input name="name" required defaultValue={investment.name} style={INPUT} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL}>Institución</label>
                 <Dropdown name="institution_id" required defaultValue={investment.institution_id} style={INPUT}>
@@ -178,7 +178,7 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
                 </Dropdown>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL}>Tipo de instrumento</label>
                 <Dropdown name="instrument_type" required defaultValue={investment.instrument_type} style={INPUT}>
@@ -197,7 +197,7 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
                 </Dropdown>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL}>Monto inicial</label>
                 <input name="initial_amount" type="number" step="0.01" min="0" required defaultValue={investment.initial_amount} style={INPUT} />
@@ -207,7 +207,7 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
                 <input name="current_balance" type="number" step="0.01" min="0" required defaultValue={investment.current_balance} style={INPUT} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL}>Tasa de interés (%)</label>
                 <input name="interest_rate" type="number" step="0.01" min="0" max="100" defaultValue={investment.interest_rate != null ? (investment.interest_rate * 100).toFixed(2) : ""} style={INPUT} placeholder="Ej. 6.75" />
@@ -224,7 +224,7 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
                 </Dropdown>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL}>Fecha de compra</label>
                 <input name="purchase_date" type="date" defaultValue={investment.purchase_date ?? ""} style={INPUT} />
@@ -234,7 +234,7 @@ export default function InvestmentDetail({ investment, institutions, accounts, t
                 <input name="maturity_date" type="date" defaultValue={investment.maturity_date ?? ""} style={INPUT} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL}>Estado</label>
                 <Dropdown name="status" required defaultValue={investment.status} style={INPUT}>
@@ -366,7 +366,7 @@ function EditTransactionForm({ tx, currency, onClose }: {
       {state && "error" in state && (
         <div className="text-xs px-3 py-2 rounded-lg" style={{ background: "#EF444415", color: "#EF4444", border: "1px solid #EF444430" }}>{state.error}</div>
       )}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Tipo</label>
           <Dropdown name="type" required defaultValue={tx.type} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }}>
@@ -382,7 +382,7 @@ function EditTransactionForm({ tx, currency, onClose }: {
           <input name="transaction_date" type="date" required defaultValue={tx.transaction_date} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Monto ({currency})</label>
           <input name="amount" type="number" step="0.01" min="0" required defaultValue={tx.amount} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} />
@@ -447,7 +447,7 @@ function CreateTransactionForm({ investment, onClose }: {
         <p className="text-xs text-text-secondary mb-2">Inversión: <span style={{ color: "#00D9FF" }}>{investment.name}</span></p>
         <p className="text-xs text-text-secondary">Saldo actual: <span style={{ color: "#00E5A0" }}>{investment.current_balance.toFixed(2)} {investment.currency}</span></p>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Tipo</label>
           <Dropdown
@@ -468,7 +468,7 @@ function CreateTransactionForm({ investment, onClose }: {
           <input name="transaction_date" type="date" required defaultValue={today} style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-text-muted uppercase tracking-wider mb-1.5">Monto ({investment.currency})</label>
           <input

@@ -98,10 +98,10 @@ export default function TitularesManager({ accounts, investments, exchangeRate, 
 
   return (
     <>
-      <div className="flex justify-end mb-2">
+      <div className="flex justify-center md:justify-end mb-2">
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium w-full md:w-auto justify-center md:justify-start"
           style={{ background: "linear-gradient(135deg, #00D9FF22, #00E5A022)", border: "1px solid #00D9FF44", color: "#00D9FF" }}>
           <Plus size={14} /> Nuevo titular
         </button>
@@ -113,22 +113,22 @@ export default function TitularesManager({ accounts, investments, exchangeRate, 
           const accentColor = isEmpresa ? "#A78BFA" : "#00D9FF";
           return (
             <div key={account.id} className="rounded-2xl" style={{ background: "#111C33", border: "1px solid #1A2744" }}>
-              <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: invs.length > 0 ? "1px solid #1A2744" : "none" }}>
+              <div className="px-4 md:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0" style={{ borderBottom: invs.length > 0 ? "1px solid #1A2744" : "none" }}>
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${accentColor}15`, border: `1px solid ${accentColor}33` }}>
                     {isEmpresa ? <Building size={16} style={{ color: accentColor }} /> : <User size={16} style={{ color: accentColor }} />}
                   </div>
-                  <div>
-                    <p className="font-semibold text-text-primary">{account.name}</p>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-text-primary truncate">{account.name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: `${accentColor}15`, color: accentColor }}>
+                      <span className="text-xs px-2 py-0.5 rounded-full whitespace-nowrap" style={{ background: `${accentColor}15`, color: accentColor }}>
                         {isEmpresa ? "Empresa" : "Persona"}
                       </span>
-                      {!account.active && <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: "#EF444418", color: "#EF4444" }}>Inactivo</span>}
+                      {!account.active && <span className="text-xs px-1.5 py-0.5 rounded whitespace-nowrap" style={{ background: "#EF444418", color: "#EF4444" }}>Inactivo</span>}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-6 text-right">
+                <div className="flex flex-col md:flex-row md:items-center md:gap-6 gap-3 text-left md:text-right">
                   {invs.length > 0 ? (
                     <>
                       <div>
