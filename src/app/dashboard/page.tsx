@@ -196,7 +196,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-0">
         <div className="flex-1">
-          <div className="flex items-start justify-between gap-3 md:gap-4">
+          <div className="flex items-start justify-between gap-3 md:gap-4 md:items-center">
             <div>
               <h1 className="text-xl font-semibold text-text-primary">Resumen</h1>
               <p className="text-sm text-text-muted mt-0.5">
