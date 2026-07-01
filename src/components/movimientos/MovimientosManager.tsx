@@ -97,7 +97,7 @@ function TransactionForm({ activeInvestments, onClose }: { activeInvestments: Ac
           ))}
         </Dropdown>
         {selectedInv && (
-          <p className="text-xs text-text-secondary mt-1">Saldo actual: <span style={{ color: "#00D9FF" }}>{selectedInv.currentBalance.toFixed(2)}</span> {selectedInv.currency}</p>
+          <p className="text-xs text-text-secondary mt-1">Saldo actual: <span style={{ color: "#00D9FF" }}>{formatCurrency(selectedInv.currentBalance, selectedInv.currency)}</span></p>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

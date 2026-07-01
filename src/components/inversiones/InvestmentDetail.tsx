@@ -445,7 +445,7 @@ function CreateTransactionForm({ investment, onClose }: {
       )}
       <div>
         <p className="text-xs text-text-secondary mb-2">Inversión: <span style={{ color: "#00D9FF" }}>{investment.name}</span></p>
-        <p className="text-xs text-text-secondary">Saldo actual: <span style={{ color: "#00E5A0" }}>{investment.current_balance.toFixed(2)} {investment.currency}</span></p>
+        <p className="text-xs text-text-secondary">Saldo actual: <span style={{ color: "#00E5A0" }}>{formatCurrency(investment.current_balance, investment.currency)}</span></p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>

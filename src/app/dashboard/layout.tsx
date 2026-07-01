@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Sidebar from "@/components/layout/Sidebar";
+import FloatingCalculator from "@/components/calculator/FloatingCalculator";
 
 export default async function DashboardLayout({
   children,
@@ -20,6 +21,7 @@ export default async function DashboardLayout({
           {children}
         </div>
       </main>
+      <FloatingCalculator />
     </div>
   );
 }
