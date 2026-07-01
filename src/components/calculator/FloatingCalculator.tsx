@@ -50,6 +50,15 @@ function formatDisplay(raw: string): string {
   return (neg ? "-" : "") + out;
 }
 
+function operatorSymbol(op: Operator): string {
+  switch (op) {
+    case "+": return "+";
+    case "-": return "−";
+    case "*": return "×";
+    case "/": return "÷";
+  }
+}
+
 const BTN_BASE: React.CSSProperties = {
   border: "1px solid #1A2744",
   background: "#0E1628",
@@ -61,18 +70,43 @@ const BTN_BASE: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   cursor: "pointer",
-  transition: "background 0.15s",
+  transition: "background 0.1s, transform 0.1s",
+};
+
+const BTN_PRESSED: React.CSSProperties = {
+  transform: "scale(0.92)",
+  filter: "brightness(1.4)",
 };
 
 export default function FloatingCalculator() {
   const [isOpen, setIsOpen] = useState(false);
   const [state, setState] = useState<CalcState>(INITIAL_STATE);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [pressedKey, setPressedKey] = useState<string | null>(null);
   const dragRef = useRef<{ dragging: boolean; offsetX: number; offsetY: number }>({
     dragging: false,
     offsetX: 0,
     offsetY: 0,
   });
+  const flashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function flashKey(id: string) {
+    setPressedKey(id);
+    if (flashTimeout.current) clearTimeout(flashTimeout.current);
+    flashTimeout.current = setTimeout(() => setPressedKey((k) => (k === id ? null : k)), 120);
+  }
+
+  function btnStyle(id: string, extra?: React.CSSProperties): React.CSSProperties {
+    return { ...BTN_BASE, ...extra, ...(pressedKey === id ? BTN_PRESSED : null) };
+  }
+
+  function pressHandlers(id: string) {
+    return {
+      onPointerDown: () => setPressedKey(id),
+      onPointerUp: () => setPressedKey((k) => (k === id ? null : k)),
+      onPointerLeave: () => setPressedKey((k) => (k === id ? null : k)),
+    };
+  }
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -192,16 +226,16 @@ export default function FloatingCalculator() {
       const target = e.target as HTMLElement;
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
 
-      if (e.key >= "0" && e.key <= "9") { inputDigit(e.key); e.preventDefault(); return; }
-      if (e.key === ".") { inputDecimal(); e.preventDefault(); return; }
-      if (e.key === "+") { performOperation("+"); e.preventDefault(); return; }
-      if (e.key === "-") { performOperation("-"); e.preventDefault(); return; }
-      if (e.key === "*") { performOperation("*"); e.preventDefault(); return; }
-      if (e.key === "/") { performOperation("/"); e.preventDefault(); return; }
-      if (e.key === "Enter" || e.key === "=") { handleEquals(); e.preventDefault(); return; }
-      if (e.key === "Backspace") { handleBackspace(); e.preventDefault(); return; }
+      if (e.key >= "0" && e.key <= "9") { inputDigit(e.key); flashKey(e.key); e.preventDefault(); return; }
+      if (e.key === ".") { inputDecimal(); flashKey("."); e.preventDefault(); return; }
+      if (e.key === "+") { performOperation("+"); flashKey("+"); e.preventDefault(); return; }
+      if (e.key === "-") { performOperation("-"); flashKey("-"); e.preventDefault(); return; }
+      if (e.key === "*") { performOperation("*"); flashKey("*"); e.preventDefault(); return; }
+      if (e.key === "/") { performOperation("/"); flashKey("/"); e.preventDefault(); return; }
+      if (e.key === "Enter" || e.key === "=") { handleEquals(); flashKey("="); e.preventDefault(); return; }
+      if (e.key === "Backspace") { handleBackspace(); flashKey("back"); e.preventDefault(); return; }
       if (e.key === "Escape") { setIsOpen(false); e.preventDefault(); return; }
-      if (e.key.toLowerCase() === "c") { handleClear(); e.preventDefault(); return; }
+      if (e.key.toLowerCase() === "c") { handleClear(); flashKey("clear"); e.preventDefault(); return; }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -249,36 +283,43 @@ export default function FloatingCalculator() {
 
           <div className="px-3 pt-3 pb-2">
             <div
-              className="w-full text-right rounded-lg px-3 py-3 font-mono text-xl overflow-x-auto"
-              style={{ background: "#0E1628", border: "1px solid #1A2744", color: state.display === "Error" ? "#EF4444" : "#00E5A0" }}>
-              {formatDisplay(state.display)}
+              className="w-full text-right rounded-lg px-3 py-3 overflow-x-auto"
+              style={{ background: "#0E1628", border: "1px solid #1A2744" }}>
+              <div className="text-xs font-mono h-4" style={{ color: "#7A8FB0" }}>
+                {state.operator && state.previousValue !== null
+                  ? `${formatDisplay(state.previousValue.toFixed(2))} ${operatorSymbol(state.operator)}`
+                  : " "}
+              </div>
+              <div className="font-mono text-xl" style={{ color: state.display === "Error" ? "#EF4444" : "#00E5A0" }}>
+                {formatDisplay(state.display)}
+              </div>
             </div>
           </div>
 
           <div className="grid grid-cols-4 gap-1.5 px-3 pb-3">
-            <button style={{ ...BTN_BASE, color: "#EF4444" }} onClick={handleClear}>C</button>
-            <button style={BTN_BASE} onClick={handleBackspace}><Delete size={16} /></button>
-            <button style={BTN_BASE} onClick={toggleSign}>±</button>
-            <button style={{ ...BTN_BASE, color: "#00D9FF" }} onClick={() => performOperation("/")}>÷</button>
+            <button style={btnStyle("clear", { color: "#EF4444" })} {...pressHandlers("clear")} onClick={handleClear}>C</button>
+            <button style={btnStyle("back")} {...pressHandlers("back")} onClick={handleBackspace}><Delete size={16} /></button>
+            <button style={btnStyle("sign")} {...pressHandlers("sign")} onClick={toggleSign}>±</button>
+            <button style={btnStyle("/", { color: "#00D9FF" })} {...pressHandlers("/")} onClick={() => performOperation("/")}>÷</button>
 
-            <button style={BTN_BASE} onClick={() => inputDigit("7")}>7</button>
-            <button style={BTN_BASE} onClick={() => inputDigit("8")}>8</button>
-            <button style={BTN_BASE} onClick={() => inputDigit("9")}>9</button>
-            <button style={{ ...BTN_BASE, color: "#00D9FF" }} onClick={() => performOperation("*")}>×</button>
+            <button style={btnStyle("7")} {...pressHandlers("7")} onClick={() => inputDigit("7")}>7</button>
+            <button style={btnStyle("8")} {...pressHandlers("8")} onClick={() => inputDigit("8")}>8</button>
+            <button style={btnStyle("9")} {...pressHandlers("9")} onClick={() => inputDigit("9")}>9</button>
+            <button style={btnStyle("*", { color: "#00D9FF" })} {...pressHandlers("*")} onClick={() => performOperation("*")}>×</button>
 
-            <button style={BTN_BASE} onClick={() => inputDigit("4")}>4</button>
-            <button style={BTN_BASE} onClick={() => inputDigit("5")}>5</button>
-            <button style={BTN_BASE} onClick={() => inputDigit("6")}>6</button>
-            <button style={{ ...BTN_BASE, color: "#00D9FF" }} onClick={() => performOperation("-")}>−</button>
+            <button style={btnStyle("4")} {...pressHandlers("4")} onClick={() => inputDigit("4")}>4</button>
+            <button style={btnStyle("5")} {...pressHandlers("5")} onClick={() => inputDigit("5")}>5</button>
+            <button style={btnStyle("6")} {...pressHandlers("6")} onClick={() => inputDigit("6")}>6</button>
+            <button style={btnStyle("-", { color: "#00D9FF" })} {...pressHandlers("-")} onClick={() => performOperation("-")}>−</button>
 
-            <button style={BTN_BASE} onClick={() => inputDigit("1")}>1</button>
-            <button style={BTN_BASE} onClick={() => inputDigit("2")}>2</button>
-            <button style={BTN_BASE} onClick={() => inputDigit("3")}>3</button>
-            <button style={{ ...BTN_BASE, color: "#00D9FF" }} onClick={() => performOperation("+")}>+</button>
+            <button style={btnStyle("1")} {...pressHandlers("1")} onClick={() => inputDigit("1")}>1</button>
+            <button style={btnStyle("2")} {...pressHandlers("2")} onClick={() => inputDigit("2")}>2</button>
+            <button style={btnStyle("3")} {...pressHandlers("3")} onClick={() => inputDigit("3")}>3</button>
+            <button style={btnStyle("+", { color: "#00D9FF" })} {...pressHandlers("+")} onClick={() => performOperation("+")}>+</button>
 
-            <button style={BTN_BASE} className="col-span-2" onClick={() => inputDigit("0")}>0</button>
-            <button style={BTN_BASE} onClick={inputDecimal}>.</button>
-            <button style={{ ...BTN_BASE, background: "#00E5A022", color: "#00E5A0", border: "1px solid #00E5A044" }} onClick={handleEquals}>=</button>
+            <button style={btnStyle("0")} className="col-span-2" {...pressHandlers("0")} onClick={() => inputDigit("0")}>0</button>
+            <button style={btnStyle(".")} {...pressHandlers(".")} onClick={inputDecimal}>.</button>
+            <button style={btnStyle("=", { background: "#00E5A022", color: "#00E5A0", border: "1px solid #00E5A044" })} {...pressHandlers("=")} onClick={handleEquals}>=</button>
           </div>
         </div>
       )}
