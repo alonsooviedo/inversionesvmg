@@ -309,7 +309,7 @@ export default function FloatingCalculator() {
       <button
         onClick={() => setIsOpen((v) => !v)}
         aria-label="Calculadora"
-        className="fixed bottom-6 right-6 z-40 p-3 rounded-full shadow-lg transition-transform hover:scale-105"
+        className="fixed bottom-6 right-6 z-[60] p-3 rounded-full shadow-lg transition-transform hover:scale-105"
         style={{ background: "#0E1628", border: "1px solid #00D9FF44", color: "#00D9FF" }}>
         <CalculatorIcon size={20} />
       </button>
@@ -317,7 +317,7 @@ export default function FloatingCalculator() {
       {isOpen && position && (
         <div
           ref={panelRef}
-          className="fixed z-50 flex flex-col rounded-xl shadow-2xl select-none"
+          className="fixed z-[60] flex flex-col rounded-xl shadow-2xl select-none"
           style={{
             left: position.x,
             top: position.y,
