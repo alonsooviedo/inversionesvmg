@@ -280,8 +280,10 @@ export default function InversionesManager({ investments, institutions, accounts
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="w-full md:w-auto flex items-center justify-center md:justify-start gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
-          style={{ background: "linear-gradient(135deg, #00D9FF22, #00E5A022)", border: "1px solid #00D9FF44", color: "#00D9FF" }}>
+          className="w-full md:w-auto flex items-center justify-center md:justify-start gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer active:scale-95"
+          style={{ background: "linear-gradient(135deg, #00D9FF22, #00E5A022)", border: "1px solid #00D9FF44", color: "#00D9FF" }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "linear-gradient(135deg, #00D9FF3A, #00E5A03A)")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "linear-gradient(135deg, #00D9FF22, #00E5A022)")}>
           <Plus size={14} /> Nueva inversión
         </button>
       </div>

@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  ChevronLeft,
   History,
   Menu,
   X,
@@ -28,7 +29,13 @@ const NAV = [
   { href: "/dashboard/configuracion", label: "Configuración", icon: Settings },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({
+  collapsed = false,
+  onToggleCollapsed,
+}: {
+  collapsed?: boolean;
+  onToggleCollapsed?: () => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -64,12 +71,25 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-56 flex flex-col z-40 md:z-50 transition-transform duration-300 ${
+        className={`fixed left-0 top-0 h-screen w-56 flex flex-col z-40 md:z-50 transition-all duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        } md:translate-x-0 md:block`}
+        } md:translate-x-0 md:block ${collapsed ? "md:w-16" : "md:w-56"}`}
         style={{ background: "#0E1628", borderRight: "1px solid #1A2744" }}>
+      {/* Toggle collapse - desktop only */}
+      {onToggleCollapsed && (
+        <button
+          onClick={onToggleCollapsed}
+          aria-label={collapsed ? "Expandir menú" : "Minimizar menú"}
+          className="hidden md:flex items-center justify-center absolute -right-3 top-8 w-6 h-6 rounded-full transition-colors z-10"
+          style={{ background: "#0E1628", border: "1px solid #1A2744", color: "#7A8FB0" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#00D9FF")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#7A8FB0")}>
+          {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
+        </button>
+      )}
+
       {/* Logo */}
-      <div className="px-6 py-6 flex items-center gap-3">
+      <div className={`px-6 py-6 flex items-center gap-3 ${collapsed ? "md:px-4 md:justify-center" : ""}`}>
         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{ background: "linear-gradient(135deg, #00D9FF22, #00E5A022)", border: "1px solid #00D9FF44" }}>
           <svg width="16" height="16" viewBox="0 0 28 28" fill="none">
@@ -77,7 +97,7 @@ export default function Sidebar() {
             <circle cx="14" cy="14" r="3" fill="#00D9FF"/>
           </svg>
         </div>
-        <div>
+        <div className={collapsed ? "md:hidden" : ""}>
           <p className="text-sm font-semibold text-text-primary leading-none">Portfolio</p>
           <p className="text-xs text-text-muted mt-0.5">Inversiones</p>
         </div>
@@ -92,15 +112,16 @@ export default function Sidebar() {
               key={href}
               href={href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group nav-item${isActive ? " nav-item-active" : ""}`}
+              title={collapsed ? label : undefined}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group nav-item${isActive ? " nav-item-active" : ""} ${collapsed ? "md:justify-center md:px-0" : ""}`}
               style={{
                 background: isActive ? "#162040" : "transparent",
                 color: isActive ? "#00D9FF" : "#7A8FB0",
                 border: isActive ? "1px solid #00D9FF22" : "1px solid transparent",
               }}>
               <Icon size={16} className="flex-shrink-0" />
-              <span className="flex-1">{label}</span>
-              {isActive && <ChevronRight size={12} />}
+              <span className={`flex-1 ${collapsed ? "md:hidden" : ""}`}>{label}</span>
+              {isActive && <ChevronRight size={12} className={collapsed ? "md:hidden" : ""} />}
             </Link>
           );
         })}
@@ -110,12 +131,13 @@ export default function Sidebar() {
       <div className="px-3 py-4 border-t" style={{ borderColor: "#1A2744" }}>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm w-full transition-all"
+          title={collapsed ? "Salir" : undefined}
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm w-full transition-all ${collapsed ? "md:justify-center md:px-0" : ""}`}
           style={{ color: "#7A8FB0" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "#EF4444")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "#7A8FB0")}>
           <LogOut size={16} />
-          <span>Salir</span>
+          <span className={collapsed ? "md:hidden" : ""}>Salir</span>
         </button>
       </div>
       </aside>
