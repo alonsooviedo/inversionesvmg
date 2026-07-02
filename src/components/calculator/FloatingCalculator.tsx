@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { Calculator as CalculatorIcon, X, Delete } from "lucide-react";
 
 const STORAGE_KEY = "calculator_position";
-const WINDOW_WIDTH = 260;
-const WINDOW_HEIGHT = 360;
+const BASE_WIDTH = 260;
+const BASE_HEIGHT = 384;
+const MIN_WIDTH = 220;
+const MAX_WIDTH = 480;
 
 type Operator = "+" | "-" | "*" | "/";
 
@@ -64,8 +66,6 @@ const BTN_BASE: React.CSSProperties = {
   background: "#0E1628",
   color: "#E8EDF5",
   borderRadius: "8px",
-  fontSize: "15px",
-  height: "44px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -82,13 +82,26 @@ export default function FloatingCalculator() {
   const [isOpen, setIsOpen] = useState(false);
   const [state, setState] = useState<CalcState>(INITIAL_STATE);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [width, setWidth] = useState(BASE_WIDTH);
   const [pressedKey, setPressedKey] = useState<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ dragging: boolean; offsetX: number; offsetY: number }>({
     dragging: false,
     offsetX: 0,
     offsetY: 0,
   });
+  const resizeRef = useRef<{ resizing: boolean; startX: number; startWidth: number }>({
+    resizing: false,
+    startX: 0,
+    startWidth: BASE_WIDTH,
+  });
   const flashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const liveRef = useRef<{ x: number; y: number; width: number }>({ x: 0, y: 0, width: BASE_WIDTH });
+  const scale = width / BASE_WIDTH;
+
+  function px(base: number): number {
+    return Math.round(base * scale);
+  }
 
   function flashKey(id: string) {
     setPressedKey(id);
@@ -97,7 +110,13 @@ export default function FloatingCalculator() {
   }
 
   function btnStyle(id: string, extra?: React.CSSProperties): React.CSSProperties {
-    return { ...BTN_BASE, ...extra, ...(pressedKey === id ? BTN_PRESSED : null) };
+    return {
+      ...BTN_BASE,
+      ...extra,
+      height: px(44),
+      fontSize: px(15),
+      ...(pressedKey === id ? BTN_PRESSED : null),
+    };
   }
 
   function pressHandlers(id: string) {
@@ -108,46 +127,90 @@ export default function FloatingCalculator() {
     };
   }
 
+  function clampWidth(w: number) {
+    const viewportMax = typeof window !== "undefined" ? window.innerWidth - 16 : MAX_WIDTH;
+    return Math.min(Math.max(MIN_WIDTH, w), Math.min(MAX_WIDTH, viewportMax));
+  }
+
+  function clampPosition(x: number, y: number, w?: number) {
+    const effectiveWidth = w ?? panelRef.current?.offsetWidth ?? width;
+    const effectiveHeight = panelRef.current?.offsetHeight ?? BASE_HEIGHT * (effectiveWidth / BASE_WIDTH);
+    const maxX = Math.max(8, window.innerWidth - effectiveWidth - 8);
+    const maxY = Math.max(8, window.innerHeight - effectiveHeight - 8);
+    return { x: Math.min(Math.max(8, x), maxX), y: Math.min(Math.max(8, y), maxY) };
+  }
+
+  function saveLive() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(liveRef.current));
+  }
+
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
+    let initialWidth = BASE_WIDTH;
+    let initialPos: { x: number; y: number };
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        if (typeof parsed.width === "number") initialWidth = clampWidth(parsed.width);
         if (typeof parsed.x === "number" && typeof parsed.y === "number") {
-          setPosition(clampPosition(parsed.x, parsed.y));
+          initialPos = clampPosition(parsed.x, parsed.y, initialWidth);
+          setWidth(initialWidth);
+          setPosition(initialPos);
+          liveRef.current = { x: initialPos.x, y: initialPos.y, width: initialWidth };
           return;
         }
       } catch {}
     }
-    setPosition(clampPosition(window.innerWidth - WINDOW_WIDTH - 24, window.innerHeight - WINDOW_HEIGHT - 24));
+    setWidth(initialWidth);
+    const estHeight = BASE_HEIGHT * (initialWidth / BASE_WIDTH);
+    initialPos = clampPosition(window.innerWidth - initialWidth - 24, window.innerHeight - estHeight - 24, initialWidth);
+    setPosition(initialPos);
+    liveRef.current = { x: initialPos.x, y: initialPos.y, width: initialWidth };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  function clampPosition(x: number, y: number) {
-    const maxX = Math.max(8, window.innerWidth - WINDOW_WIDTH - 8);
-    const maxY = Math.max(8, window.innerHeight - WINDOW_HEIGHT - 8);
-    return { x: Math.min(Math.max(8, x), maxX), y: Math.min(Math.max(8, y), maxY) };
-  }
-
-  function savePosition(x: number, y: number) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ x, y }));
-  }
 
   function onHeaderPointerDown(e: React.PointerEvent) {
     if (!position) return;
     dragRef.current = { dragging: true, offsetX: e.clientX - position.x, offsetY: e.clientY - position.y };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    try {
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {}
   }
 
   function onHeaderPointerMove(e: React.PointerEvent) {
     if (!dragRef.current.dragging) return;
     const next = clampPosition(e.clientX - dragRef.current.offsetX, e.clientY - dragRef.current.offsetY);
     setPosition(next);
+    liveRef.current = { ...liveRef.current, x: next.x, y: next.y };
   }
 
   function onHeaderPointerUp() {
     if (!dragRef.current.dragging) return;
     dragRef.current.dragging = false;
-    if (position) savePosition(position.x, position.y);
+    saveLive();
+  }
+
+  function onResizePointerDown(e: React.PointerEvent) {
+    resizeRef.current = { resizing: true, startX: e.clientX, startWidth: width };
+    try {
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {}
+  }
+
+  function onResizePointerMove(e: React.PointerEvent) {
+    if (!resizeRef.current.resizing) return;
+    const delta = e.clientX - resizeRef.current.startX;
+    const nextWidth = clampWidth(resizeRef.current.startWidth + delta);
+    setWidth(nextWidth);
+    const next = clampPosition(liveRef.current.x, liveRef.current.y, nextWidth);
+    setPosition(next);
+    liveRef.current = { x: next.x, y: next.y, width: nextWidth };
+  }
+
+  function onResizePointerUp() {
+    if (!resizeRef.current.resizing) return;
+    resizeRef.current.resizing = false;
+    saveLive();
   }
 
   function inputDigit(d: string) {
@@ -253,11 +316,12 @@ export default function FloatingCalculator() {
 
       {isOpen && position && (
         <div
+          ref={panelRef}
           className="fixed z-50 flex flex-col rounded-xl shadow-2xl select-none"
           style={{
             left: position.x,
             top: position.y,
-            width: WINDOW_WIDTH,
+            width,
             background: "#0B1220",
             border: "1px solid #1A2744",
           }}>
@@ -265,40 +329,40 @@ export default function FloatingCalculator() {
             onPointerDown={onHeaderPointerDown}
             onPointerMove={onHeaderPointerMove}
             onPointerUp={onHeaderPointerUp}
-            className="flex items-center justify-between px-3 py-2 rounded-t-xl cursor-move"
-            style={{ background: "#0E1628", borderBottom: "1px solid #1A2744" }}>
-            <span className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
-              <CalculatorIcon size={13} /> Calculadora
+            className="flex items-center justify-between rounded-t-xl cursor-move"
+            style={{ background: "#0E1628", borderBottom: "1px solid #1A2744", padding: `${px(8)}px ${px(12)}px` }}>
+            <span className="font-medium text-text-secondary flex items-center gap-1.5" style={{ fontSize: px(12) }}>
+              <CalculatorIcon size={px(13)} /> Calculadora
             </span>
             <button
               onClick={() => setIsOpen(false)}
               aria-label="Cerrar"
-              className="p-1 rounded transition-colors"
-              style={{ color: "#7A8FB0" }}
+              className="rounded transition-colors"
+              style={{ color: "#7A8FB0", padding: px(4) }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "#EF4444")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#7A8FB0")}>
-              <X size={14} />
+              <X size={px(14)} />
             </button>
           </div>
 
-          <div className="px-3 pt-3 pb-2">
+          <div style={{ padding: `${px(12)}px ${px(12)}px ${px(8)}px` }}>
             <div
-              className="w-full text-right rounded-lg px-3 py-3 overflow-x-auto"
-              style={{ background: "#0E1628", border: "1px solid #1A2744" }}>
-              <div className="text-xs font-mono h-4" style={{ color: "#7A8FB0" }}>
+              className="w-full text-right rounded-lg overflow-x-auto"
+              style={{ background: "#0E1628", border: "1px solid #1A2744", padding: px(12) }}>
+              <div className="font-mono" style={{ color: "#7A8FB0", fontSize: px(12), height: px(16) }}>
                 {state.operator && state.previousValue !== null
                   ? `${formatDisplay(state.previousValue.toFixed(2))} ${operatorSymbol(state.operator)}`
-                  : " "}
+                  : " "}
               </div>
-              <div className="font-mono text-xl" style={{ color: state.display === "Error" ? "#EF4444" : "#00E5A0" }}>
+              <div className="font-mono" style={{ fontSize: px(20), color: state.display === "Error" ? "#EF4444" : "#00E5A0" }}>
                 {formatDisplay(state.display)}
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-1.5 px-3 pb-3">
+          <div className="grid grid-cols-4" style={{ gap: px(6), padding: `0 ${px(12)}px ${px(12)}px` }}>
             <button style={btnStyle("clear", { color: "#EF4444" })} {...pressHandlers("clear")} onClick={handleClear}>C</button>
-            <button style={btnStyle("back")} {...pressHandlers("back")} onClick={handleBackspace}><Delete size={16} /></button>
+            <button style={btnStyle("back")} {...pressHandlers("back")} onClick={handleBackspace}><Delete size={px(16)} /></button>
             <button style={btnStyle("sign")} {...pressHandlers("sign")} onClick={toggleSign}>±</button>
             <button style={btnStyle("/", { color: "#00D9FF" })} {...pressHandlers("/")} onClick={() => performOperation("/")}>÷</button>
 
@@ -320,6 +384,18 @@ export default function FloatingCalculator() {
             <button style={btnStyle("0")} className="col-span-2" {...pressHandlers("0")} onClick={() => inputDigit("0")}>0</button>
             <button style={btnStyle(".")} {...pressHandlers(".")} onClick={inputDecimal}>.</button>
             <button style={btnStyle("=", { background: "#00E5A022", color: "#00E5A0", border: "1px solid #00E5A044" })} {...pressHandlers("=")} onClick={handleEquals}>=</button>
+          </div>
+
+          <div
+            onPointerDown={onResizePointerDown}
+            onPointerMove={onResizePointerMove}
+            onPointerUp={onResizePointerUp}
+            aria-label="Redimensionar"
+            className="absolute bottom-0 right-0"
+            style={{ width: px(18), height: px(18), cursor: "nwse-resize", touchAction: "none" }}>
+            <svg width="100%" height="100%" viewBox="0 0 16 16" style={{ opacity: 0.5 }}>
+              <path d="M14 2 L2 14 M14 7 L7 14 M14 12 L12 14" stroke="#7A8FB0" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
           </div>
         </div>
       )}
