@@ -453,7 +453,7 @@ function CreateTransactionForm({ investment, onClose }: {
           <Dropdown
             name="type"
             required
-            style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none" }}
+            style={{ width: "100%", background: "#0E1628", border: "1px solid #1A2744", borderRadius: "8px", padding: "8px 12px", fontSize: "13px", color: "#E8EDF5", outline: "none", minHeight: "44px" }}
             onChange={(value) => setType(value)}>
             <option value="">Seleccionar…</option>
             <option value="interest">Interés (+suma)</option>
